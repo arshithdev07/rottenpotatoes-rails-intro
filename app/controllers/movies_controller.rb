@@ -1,4 +1,5 @@
 class MoviesController < ApplicationController
+  helper_method :sort_column, :sort_direction
 
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
@@ -11,8 +12,20 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @movies = Movie.order("#{sort_column} #{sort_direction}")
   end
+ private 
+    def sortable_columns
+      ["title", "release_date"]
+    end
+  
+    def sort_column
+      sortable_columns.include?(params[:column]) ? params[:column] : "title"
+    end
+  
+    def sort_direction
+      %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
+    end
 
   def new
     # default: render 'new' template
