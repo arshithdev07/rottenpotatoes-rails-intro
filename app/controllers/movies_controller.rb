@@ -12,7 +12,7 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.order("#{sort_column} #{sort_direction}")
+    @movies = Movie.order(sort_column + " " + sort_direction)
   end
  private 
     def sortable_columns
@@ -20,7 +20,7 @@ class MoviesController < ApplicationController
     end
   
     def sort_column
-      sortable_columns.include?(params[:column]) ? params[:column] : "title"
+      sortable_columns.include?(params[:sort]) ? params[:sort] : "title"
     end
   
     def sort_direction

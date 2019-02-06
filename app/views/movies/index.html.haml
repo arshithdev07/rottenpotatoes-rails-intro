@@ -4,9 +4,9 @@
 %table#movies
   %thead
     %tr
-      %th= sortable("title")
+      %th{params[:sort] == "title" ? {:class => "hilite"} : {}}= sortable("title")
       %th Rating
-      %th= sortable("release_date")
+      %th{params[:sort] == "release_date" ? {:class => "hilite"} : {}}= sortable("release_date")
       %th More Info
   %tbody
     - @movies.each do |movie|
