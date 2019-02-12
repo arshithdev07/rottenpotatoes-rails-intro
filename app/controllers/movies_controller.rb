@@ -18,7 +18,8 @@ class MoviesController < ApplicationController
     if @selected_ratings == {}
       @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
     end
-    @movies = Movie.where(rating: @selected_ratings.keys).order(sort_column + " " + sort_direction)
+    @marked = @selected_ratings.keys
+    @movies = Movie.order(sort_column + " " + sort_direction).with_ratings(@marked)
   end
 
   def sortable_columns
