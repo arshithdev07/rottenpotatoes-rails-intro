@@ -12,14 +12,24 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @sort = sort_column + " " + sort_direction
+    puts "sort param " + @sort
     @all_ratings = Movie.all_ratings
-    @selected_ratings = params[:ratings] || {}
+    @selected_ratings = params[:ratings] || session[:ratings] || {}
 
     if @selected_ratings == {}
       @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
     end
+    
+    puts "filter param ", @selected_ratings
+    
+    if params[:ratings] != session[:ratings]
+      session[:ratings] = @selected_ratings
+      redirect_to :ratings => @selected_ratings , :sort => sort_column, :direction => sort_direction and return
+    end
+    
     @marked = @selected_ratings.keys
-    @movies = Movie.order(sort_column + " " + sort_direction).with_ratings(@marked)
+    @movies = Movie.order(@sort).with_ratings(@marked)
   end
 
   def sortable_columns
@@ -27,11 +37,19 @@ class MoviesController < ApplicationController
   end
 
   def sort_column
-    sortable_columns.include?(params[:sort]) ? params[:sort] : "title"
+    @sort_title = params[:sort] || session[:sort] || "title"
+    if params[:sort] != session[:sort]
+      session[:sort] = @sort_title
+    end 
+    @sort_title
   end
 
   def sort_direction
-    %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
+    @sort_direction = params[:direction] || session[:direction] || "asc"
+    if params[:direction] != session[:direction]
+      session[:direction] = @sort_direction
+    end 
+    @sort_direction
   end
 
   def new
@@ -61,5 +79,7 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
+  
+  
 
 end
